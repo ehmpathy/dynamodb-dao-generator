@@ -2,7 +2,7 @@
   "name": "dynamodb-dao-generator",
   "author": "ehmpathy",
   "description": "Generate data-access-objects from your domain-objects.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "repository": "ehmpathy/dynamodb-dao-generator",
   "homepage": "https://github.com/ehmpathy/dynamodb-dao-generator",
   "keywords": [
