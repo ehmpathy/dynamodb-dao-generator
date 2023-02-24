@@ -8,6 +8,7 @@
     "useUnknownInCatchVariables": false,
     "exactOptionalPropertyTypes": false,
     "sourceMap": true,
+    "declaration": true,
     "outDir": "dist",
     "target": "es6",
   },

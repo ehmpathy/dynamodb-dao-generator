@@ -48,31 +48,42 @@ This file will define which `domain-objects` you want to generate `data-access-o
 
 For example:
 ```ts
-// codegen.dao.dynamodb.ts
+// codegen.dynamodb.dao.ts
 
-import { Sensor, Location } from 'src/domain';
+import {
+  DeclaredDaoSpecification,
+  DeclaredDomainObjectIntrospectionPaths,
+  DeclaredOutputDirectories,
+} from 'dynamodb-dao-generator';
 
-export const directories = {
-  terraform: `${__dirname}/provision/aws/product`,
-  dao: `${__dirname}/src/data/dao`,
+import { Sensor, Address } from './src/domain';
+
+export const introspect: DeclaredDomainObjectIntrospectionPaths = [
+  './src/domain/index.ts',
+];
+
+export const directories: DeclaredOutputDirectories = {
+  terraform: `provision/aws/product`,
+  dao: `src/data/dao`,
 };
 
-export const generateFor = [
+export const specifications: DeclaredDaoSpecification[] = [
   {
     domainObject: Sensor,
     supplementalIndexes: [
-      { filterByKeys: ['locationUuid'] },
-      { filterByKeys: ['ownerUuid'], sortByKeys: ['createdAt'] },
-    ]
+      { filterByKey: ['addressUuid'] },
+      { filterByKey: ['ownerUuid'], sortByKey: ['createdAt'] },
+    ],
   },
   {
-    domainObject: Location,
+    domainObject: Address,
     supplementalIndexes: [
-      { filterByKeys: ['city', 'state'] },
-      { filterByKeys: ['postalCode'] },
-    ]
-  }
-]
+      { filterByKey: ['city', 'state'] },
+      { filterByKey: ['postal'] },
+    ],
+  },
+];
+
 ```
 
 ## 3. Test it out!

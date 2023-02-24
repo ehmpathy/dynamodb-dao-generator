@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`defineTypescriptDaoFindAllBySupplementalQueryCode should not serialize a single numeric sort key, to allow sorting numerically ("100" < "9", but 100 > 9) 1`] = `
+"
+import { simpleDynamodbClient } from 'simple-dynamodb-client';
+import { HasMetadata } from 'type-fns';
+
+import { SeaSponge } from '../../../domain';
+import { getConfig } from '../../../utils/config/getConfig';
+import { log } from '../../../utils/logger';
+import { castFromDatabaseObject } from './castFromDatabaseObject';
+
+const isSortingUntil = <T>(
+  args: { until: T } | { since: T },
+): args is { until: T } => !!(args as any).until;
+
+/**
+ * enables finding all SeaSponge by name with optional sorting by age
+ *
+ * written by dynamodb-dao-generator@vX.X.X 🦾
+ */
+export const findAllByNameSortByAge = async (args: {
+  name: string;
+
+  /**
+   * specify this to use a descending sort key option
+   * - specify 'ANY' to sort without filtering
+   * - specify a value to additionally filter out everything greater than the value specified
+   */
+  until: { age: number; } | 'ANY';
+
+  /**
+   * specify this to limit the number of results returned
+   */
+  limit?: number;
+} | {
+  name: string;
+
+  /**
+   * specify this to use a ascending sort key option
+   * - specify 'ANY' to sort without filtering
+   * - specify a value to additionally filter out everything less than or equal to the value specified
+   */
+  since: { age: number; } | 'ANY';
+
+  /**
+   * specify this to limit the number of results returned
+   */
+  limit?: number;
+}): Promise<HasMetadata<SeaSponge>[]> => {
+  const config = await getConfig();
+  const sortArgs = isSortingUntil(args) ? args.until : args.since;
+  const sortOperator = isSortingUntil(args) ? '<=' : '>';
+  const dontFilterOnSortKey = sortArgs === 'ANY'; // if sort args were specified as 'ANY', then they filtering on sort key was not requested
+  const items = await simpleDynamodbClient.query({
+    tableName: \`\${config.service}-\${config.environment}-table-sea-sponge-by-uuid\`,
+    logDebug: log.debug,
+    attributesToRetrieveInQuery: ['o'],
+    queryConditions: {
+      IndexName: 'index-by-name-sort-age',
+      KeyConditionExpression:
+        dontFilterOnSortKey
+          ? 'p3 = :p3' // no need to check sort key if sorting on any
+          : \`p3 = :p3 AND s3 \${sortOperator} :s3\`, // otherwise compare sort key
+      ExpressionAttributeValues: {
+        ':p3': JSON.stringify([args.name]),
+        ...(dontFilterOnSortKey
+            ? undefined
+            : { ':s3': sortArgs.age }),
+      },
+      ScanIndexForward: false, // descending on sort key (latest first)
+      Limit: args.limit,
+    },
+  });
+  return items.map(castFromDatabaseObject);
+};
+"
+`;

@@ -1,0 +1,182 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`defineTerraformResourceDefinitionsForDomainObject should be able to declare a numerical sort key for a supplemental query who sorts on a single numerical property 1`] = `
+GeneratedCodeFile {
+  "code": "/**
+ * declares the tables required to persist the SeaSponge DomainEntity in dynamodb
+ * - includes the index-by-uuid table w/ all required secondary search indexes
+ * - includes an index-by-unique table per unique key, to ensure global uniqueness constraint
+ * - enforces best practices like
+ *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
+ *
+ * written by dynamodb-dao-generator@vX.X.X 🦾
+ */
+resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+  attribute {
+    name = "p1"
+    type = "S"
+  }
+  attribute {
+    name = "s1"
+    type = "N"
+  }
+  global_secondary_index {
+    name               = "index-by-name-sort-age"
+    hash_key           = "p1"
+    range_key          = "s1"
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["o"]
+  }
+
+  tags = local.tags
+}
+resource "aws_dynamodb_table" "table_sea_sponge_by_unique_on_natural_key" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-unique-on-natural-key"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+
+  tags = local.tags
+}",
+  "path": "dynamodb.table.sea_sponge.tf",
+}
+`;
+
+exports[`defineTerraformResourceDefinitionsForDomainObject should be able to declare the resource definitions for a domain object with no supplemental queries 1`] = `
+GeneratedCodeFile {
+  "code": "/**
+ * declares the tables required to persist the SeaSponge DomainEntity in dynamodb
+ * - includes the index-by-uuid table w/ all required secondary search indexes
+ * - includes an index-by-unique table per unique key, to ensure global uniqueness constraint
+ * - enforces best practices like
+ *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
+ *
+ * written by dynamodb-dao-generator@vX.X.X 🦾
+ */
+resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+  
+  tags = local.tags
+}
+resource "aws_dynamodb_table" "table_sea_sponge_by_unique_on_natural_key" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-unique-on-natural-key"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+
+  tags = local.tags
+}",
+  "path": "dynamodb.table.sea_sponge.tf",
+}
+`;
+
+exports[`defineTerraformResourceDefinitionsForDomainObject should be able to declare the resource definitions for a domain object with supplemental queries 1`] = `
+GeneratedCodeFile {
+  "code": "/**
+ * declares the tables required to persist the SeaSponge DomainEntity in dynamodb
+ * - includes the index-by-uuid table w/ all required secondary search indexes
+ * - includes an index-by-unique table per unique key, to ensure global uniqueness constraint
+ * - enforces best practices like
+ *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
+ *
+ * written by dynamodb-dao-generator@vX.X.X 🦾
+ */
+resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+  attribute {
+    name = "p1"
+    type = "S"
+  }
+  global_secondary_index {
+    name               = "index-by-age"
+    hash_key           = "p1"
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["o"]
+  }
+  attribute {
+    name = "p2"
+    type = "S"
+  }
+  attribute {
+    name = "s2"
+    type = "S"
+  }
+  global_secondary_index {
+    name               = "index-by-name-sort-shape"
+    hash_key           = "p2"
+    range_key          = "s2"
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["o"]
+  }
+
+  tags = local.tags
+}
+resource "aws_dynamodb_table" "table_sea_sponge_by_unique_on_natural_key" {
+  name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-unique-on-natural-key"
+  billing_mode = "PAY_PER_REQUEST"
+  point_in_time_recovery {
+    enabled = var.environment == "prod" ? true : false
+  }
+
+  hash_key = "p" # partition key
+
+  attribute {
+    name = "p"
+    type = "S"
+  }
+
+  tags = local.tags
+}",
+  "path": "dynamodb.table.sea_sponge.tf",
+}
+`;

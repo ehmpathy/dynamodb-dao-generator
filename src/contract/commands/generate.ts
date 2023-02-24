@@ -13,7 +13,7 @@ export default class Generate extends Command {
       char: 'c',
       description: 'path to config yml',
       required: true,
-      default: 'codegen.sql.dao.yml',
+      default: 'codegen.dynamodb.dao.ts',
     }),
   };
 
