@@ -10,6 +10,7 @@ ignores:
   - husky
   - '@oclif/plugin-help'
   - oclif
+  - ts-node
 
 # directories to not check for dependencies in
 ignorePatterns:
