@@ -17,7 +17,7 @@ const isSortingUntil = <T>(
 /**
  * enables finding all SeaSponge by name with optional sorting by age
  *
- * written by dynamodb-dao-generator@vX.X.X 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const findAllByNameSortByAge = async (args: {
   name: string;

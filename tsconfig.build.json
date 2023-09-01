@@ -14,6 +14,8 @@
     "commitlint.*",
     "codegen.*",
     "src/**/*.test.(ts|js)",
-    "src/**/__test_utils__/**/*.(ts|js)"
+    "src/**/__test_assets__/**",
+    "src/**/__test_utils__/**/*.(ts|js)",
+    "src/logic/commands/generate.integration.test.ts",
   ]
 }

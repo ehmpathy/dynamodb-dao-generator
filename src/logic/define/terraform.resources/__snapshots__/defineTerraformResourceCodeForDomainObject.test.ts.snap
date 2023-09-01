@@ -9,7 +9,7 @@ GeneratedCodeFile {
  * - enforces best practices like
  *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
  *
- * written by dynamodb-dao-generator@vX.X.X 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
   name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
@@ -71,7 +71,7 @@ GeneratedCodeFile {
  * - enforces best practices like
  *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
  *
- * written by dynamodb-dao-generator@vX.X.X 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
   name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
@@ -118,7 +118,7 @@ GeneratedCodeFile {
  * - enforces best practices like
  *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
  *
- * written by dynamodb-dao-generator@vX.X.X 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 resource "aws_dynamodb_table" "table_sea_sponge_by_uuid" {
   name         = "\${local.service}-\${var.environment}-table-sea-sponge-by-uuid"
