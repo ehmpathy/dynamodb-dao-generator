@@ -1,1 +1,1 @@
-export const getTestAssetsDir = () => __dirname;
+export const getTestAssetsDir = (): string => __dirname;

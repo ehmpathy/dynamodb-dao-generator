@@ -4,7 +4,7 @@ import {
   DomainObjectPropertyType,
 } from 'domain-objects-metadata';
 
-export const getExampleDomainObjectMetadata = () =>
+export const getExampleDomainObjectMetadata = (): DomainObjectMetadata =>
   new DomainObjectMetadata({
     name: 'SeaSponge',
     extends: DomainObjectVariant.DOMAIN_ENTITY,
