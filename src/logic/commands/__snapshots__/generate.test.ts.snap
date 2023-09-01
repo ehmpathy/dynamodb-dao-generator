@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generate should throw a helpful error if the introspected domain objects do not include one specified in the config 1`] = `
+[Error: UnexpectedCodePath: could not find domain object metadata for specified domain object name. are you sure your introspection paths import or declare this domain object?
+
+{"domainObjectName":"Sensor"}]
+`;

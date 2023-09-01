@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 
+import { UnexpectedCodePathError } from '../../utils/errors/UnexpectedCodePathError';
 import { readConfig } from '../config/readConfig';
 import { generateCodeForDomainObject } from '../generate/generateCodeForDomainObject';
 
@@ -19,12 +20,16 @@ export const generate = async ({ configPath }: { configPath: string }) => {
     )} methods, casters, terraform, and named exports...\n`,
   );
   await Promise.all(
-    config.metadatas.map((metadata) => {
+    config.specifications.map((spec) => {
       // lookup the spec for this metadata
-      const spec = config.specifications.find(
-        (thisSpec) => thisSpec.domainObjectName === metadata.name,
+      const metadata = config.metadatas.find(
+        (thisMetadata) => spec.domainObjectName === thisMetadata.name,
       );
-      if (!spec) return null; // if this metadata was not identified in a spec, thats fine. we expect metadatas to be a superset
+      if (!metadata)
+        throw new UnexpectedCodePathError(
+          'could not find domain object metadata for specified domain object name. are you sure your introspection paths import or declare this domain object?',
+          { domainObjectName: spec.domainObjectName },
+        );
 
       // if it was identified though, generate the dao
       return generateCodeForDomainObject({
