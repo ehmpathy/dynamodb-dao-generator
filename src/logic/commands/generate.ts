@@ -4,7 +4,11 @@ import { UnexpectedCodePathError } from '../../utils/errors/UnexpectedCodePathEr
 import { readConfig } from '../config/readConfig';
 import { generateCodeForDomainObject } from '../generate/generateCodeForDomainObject';
 
-export const generate = async ({ configPath }: { configPath: string }) => {
+export const generate = async ({
+  configPath,
+}: {
+  configPath: string;
+}): Promise<void> => {
   // read the declarations from config
   console.log(
     `${chalk.bold(
@@ -28,7 +32,12 @@ export const generate = async ({ configPath }: { configPath: string }) => {
       if (!metadata)
         throw new UnexpectedCodePathError(
           'could not find domain object metadata for specified domain object name. are you sure your introspection paths import or declare this domain object?',
-          { domainObjectName: spec.domainObjectName },
+          {
+            specified: spec.domainObjectName,
+            introspected: config.metadatas.map(
+              (thisMetadata) => thisMetadata.name,
+            ),
+          },
         );
 
       // if it was identified though, generate the dao
