@@ -41,7 +41,7 @@ import { castFromDatabaseObject } from './castFromDatabaseObject';
 /**
  * enables finding a ${domainObjectMetadata.name} by its natural unique key
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const findByUnique = async (args: ${getTypescriptTypeForQueryParameters(
     parameters,

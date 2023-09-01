@@ -35,7 +35,7 @@ import { findByUnique } from './findByUnique';
  * - supports optimistic locking
  * - autogenerates database metadata such as uuid and created at
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const upsert = async ({
   ${objectVariableName}: object,

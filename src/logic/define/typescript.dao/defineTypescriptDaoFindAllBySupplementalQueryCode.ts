@@ -149,7 +149,7 @@ import { castFromDatabaseObject } from './castFromDatabaseObject';${sortingOnKey
       : ''
   }
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const ${queryName} = async (args: ${queryParameters}): Promise<HasMetadata<${
     domainObjectMetadata.name

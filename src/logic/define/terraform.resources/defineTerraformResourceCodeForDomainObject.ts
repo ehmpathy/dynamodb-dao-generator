@@ -7,13 +7,12 @@ import { isPresent } from 'type-fns';
 
 import { GeneratedCodeFile } from '../../../domain/objects/GeneratedCodeFile';
 import { SupplementalQueryDeclaration } from '../../../domain/objects/SupplementalQueryDeclaration';
-import { getPackageVersion } from '../../../utils/getPackageVersion';
 
 export const defineDynamodbSecondaryIndexNameForSupplementalQuery = ({
   query,
 }: {
   query: SupplementalQueryDeclaration;
-}) =>
+}): string =>
   [
     'index-by',
     [
@@ -107,15 +106,13 @@ export const defineTerraformResourceCodeForDomainObject = ({
   // define a comment describing these resources
   const comment = `
 /**
- * declares the tables required to persist the ${domainObjectMetadata.name} ${
-    domainObjectMetadata.extends
-  } in dynamodb
+ * declares the tables required to persist the ${domainObjectMetadata.name} ${domainObjectMetadata.extends} in dynamodb
  * - includes the index-by-uuid table w/ all required secondary search indexes
  * - includes an index-by-unique table per unique key, to ensure global uniqueness constraint
  * - enforces best practices like
  *   - point_in_time_recovery for disaster recovery and data analytics (https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery.html)
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
   `.trim();
 

@@ -31,7 +31,7 @@ import { ${domainObjectMetadata.name} } from '../../../domain';
 /**
  * defines how to cast the domain-object to a database-object
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const castToDatabaseObject = ({
   ${camelCase(domainObjectMetadata.name)}: object,

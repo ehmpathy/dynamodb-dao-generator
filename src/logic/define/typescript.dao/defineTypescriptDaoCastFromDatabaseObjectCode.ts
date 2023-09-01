@@ -16,7 +16,7 @@ import { ${domainObjectMetadata.name} } from '../../../domain';
 /**
  * defines how to cast a database-object to a domain-object
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const castFromDatabaseObject = (item: any) => {
   // parse the item into an object
@@ -28,9 +28,7 @@ export const castFromDatabaseObject = (item: any) => {
   };
 
   // create the new object
-  return new ${domainObjectMetadata.name}(updatedObject) as HasMetadata<${
-    domainObjectMetadata.name
-  }>;
+  return new ${domainObjectMetadata.name}(updatedObject) as HasMetadata<${domainObjectMetadata.name}>;
 };
   `;
 

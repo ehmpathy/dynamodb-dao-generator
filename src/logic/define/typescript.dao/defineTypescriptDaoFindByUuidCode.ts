@@ -22,7 +22,7 @@ import { castFromDatabaseObject } from './castFromDatabaseObject';
 /**
  * enables finding a ${domainObjectMetadata.name} by uuid
  *
- * written by dynamodb-dao-generator@${getPackageVersion()} 🦾
+ * written by dynamodb-dao-generator 🦾
  */
 export const findByUuid = async ({ uuid }: { uuid: string }): Promise<HasMetadata<${
     domainObjectMetadata.name
