@@ -209,7 +209,7 @@ export const ${queryName} = async (args: ${queryParameters}): Promise<HasMetadat
           sourceObjectName: 'sortArgs',
         })} }),
       },
-      ScanIndexForward: false, // descending on sort key (latest first)
+      ScanIndexForward: isSortingUntil(args) ? false : true, // descending on sort key if "until" (latest first); otherwise, ascending on sort key for "since"
       Limit: args.limit,
     },
   });
