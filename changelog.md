@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.5](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.4...v1.0.5) (2024-04-25)
+
+
+### Bug Fixes
+
+* **unique:** ensure that if unique key has valobj it imports serialization ([45ca03d](https://github.com/ehmpathy/dynamodb-dao-generator/commit/45ca03d54198ec782fb2ce657dbc972f1791356a))
+
 ## [1.0.4](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.3...v1.0.4) (2024-04-25)
 
 
