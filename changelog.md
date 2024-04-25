@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.2...v1.0.3) (2024-04-25)
+
+
+### Bug Fixes
+
+* **support:** add support for unique keys which include domain valobjs ([e523885](https://github.com/ehmpathy/dynamodb-dao-generator/commit/e52388530f7a58a4566fb9a31669b11bc3206d61))
+
 ## [1.0.2](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.1...v1.0.2) (2023-09-01)
 
 
