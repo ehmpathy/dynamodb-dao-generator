@@ -77,6 +77,11 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
       'import { SeaTurtleReport, Region } from', // should import the referenced unique key type
     );
     expect(
+      files.find((file) => file.path.includes('findByUnique'))?.code,
+    ).toContain(
+      `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced valobj
+    );
+    expect(
       files.find((file) => file.path.includes('castToDatabaseObject'))?.code,
     ).toContain(
       `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced valobj

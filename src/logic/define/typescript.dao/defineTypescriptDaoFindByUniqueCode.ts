@@ -32,11 +32,20 @@ export const defineTypescriptDaoFindByUniqueCode = ({
     from: domainObjectMetadata,
     for: { subset: Object.keys(parameters) },
   }).map(({ referencedType }) => referencedType);
+  const serializationUtilitiesRequired = referencesToImport.length;
+
+  // define the optional imports
+  const optionalImports = [
+    '',
+    ...(serializationUtilitiesRequired
+      ? [`import { serialize, omitMetadataValues } from 'domain-objects';`]
+      : []),
+  ];
 
   // define the code
   const code = `
 import { simpleDynamodbClient } from 'simple-dynamodb-client';
-import { HasMetadata } from 'type-fns';
+import { HasMetadata } from 'type-fns';${optionalImports.join('\n')}
 
 import { ${[domainObjectMetadata.name, ...referencesToImport].join(
     ', ',
