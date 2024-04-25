@@ -2,6 +2,7 @@ name: test
 
 on:
   workflow_call:
+  pull_request:
   push:
     branches-ignore:
       - 'main' # exclude main branch, since deploy workflow triggers on main, and calls the test workflow inside of it already
