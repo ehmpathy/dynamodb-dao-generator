@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.3...v1.0.4) (2024-04-25)
+
+
+### Bug Fixes
+
+* **cicd:** ensure tests run on fork prs ([f512f24](https://github.com/ehmpathy/dynamodb-dao-generator/commit/f512f2477e3777f055b0bb05da68d359edf2b18a))
+* **sort:** ensure to scan by correct direction based on since vs until ([#11](https://github.com/ehmpathy/dynamodb-dao-generator/issues/11)) ([e859b37](https://github.com/ehmpathy/dynamodb-dao-generator/commit/e859b37c66835f62086627813aea73c3a3b0a389))
+
 ## [1.0.3](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.2...v1.0.3) (2024-04-25)
 
 
