@@ -68,7 +68,7 @@ export const findAllByNameSortByAge = async (args: {
             ? undefined
             : { ':s3': sortArgs.age }),
       },
-      ScanIndexForward: false, // descending on sort key (latest first)
+      ScanIndexForward: isSortingUntil(args) ? false : true, // descending on sort key if "until" (latest first); otherwise, ascending on sort key for "since"
       Limit: args.limit,
     },
   });
