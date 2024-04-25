@@ -1,9 +1,13 @@
+import { UnexpectedCodePathError } from '@ehmpathy/error-fns';
 import {
   DomainObjectMetadata,
   DomainObjectPropertyType,
+  DomainObjectReferenceMetadata,
 } from 'domain-objects-metadata';
+import { isPresent } from 'type-fns';
 
 import { QueryKeyType } from './getQueryKeyParametersForDomainObject';
+import { getReferenceTypePropertyNames } from './getReferenceTypePropertyNames';
 
 export const getTypescriptQueryKeySerializationCode = ({
   domainObjectMetadata,
@@ -48,8 +52,20 @@ export const getTypescriptQueryKeySerializationCode = ({
       );
   }
 
-  // otherwise, json stringify it, so that things like `null` are stringified correctly
+  // determine whether any of the keys are nested domain.value-objects, since they require extra serialization
+  const keyPropertiesOfTypeReferenceToSerialize = getReferenceTypePropertyNames(
+    {
+      from: domainObjectMetadata,
+      for: { subset: keyProperties },
+    },
+  ).map(({ propertyName }) => propertyName);
+
+  // json stringify it, so that things like `null` are stringified correctly
   return `JSON.stringify([${keyProperties
-    .map((key) => `${sourceObjectName}.${key}`)
+    .map((key) =>
+      keyPropertiesOfTypeReferenceToSerialize.includes(key)
+        ? `serialize(omitMetadataValues(${sourceObjectName}.${key}))` // if we should serialize this dobj, do so
+        : `${sourceObjectName}.${key}`,
+    )
     .join(', ')}])`;
 };

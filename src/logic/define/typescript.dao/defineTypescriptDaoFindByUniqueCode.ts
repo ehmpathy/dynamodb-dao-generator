@@ -1,11 +1,11 @@
 import { DomainObjectMetadata } from 'domain-objects-metadata';
 
 import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
-import { getPackageVersion } from '../../../utils/getPackageVersion';
 import {
   getQueryKeyParametersForDomainObject,
   QueryKeyType,
 } from './getQueryKeyParametersForDomainObject';
+import { getReferenceTypePropertyNames } from './getReferenceTypePropertyNames';
 import { getTypescriptQueryKeySerializationCode } from './getTypescriptQueryKeySerializationCode';
 import { getTypescriptTableNameBuilderCode } from './getTypescriptTableNameBuilderCode';
 import { getTypescriptTypeForQueryParameters } from './getTypescriptTypeForQueryParameters';
@@ -27,12 +27,20 @@ export const defineTypescriptDaoFindByUniqueCode = ({
     keyType: QueryKeyType.UNIQUE_KEY,
   });
 
+  // determine if we need to import any references from domain
+  const referencesToImport = getReferenceTypePropertyNames({
+    from: domainObjectMetadata,
+    for: { subset: Object.keys(parameters) },
+  }).map(({ referencedType }) => referencedType);
+
   // define the code
   const code = `
 import { simpleDynamodbClient } from 'simple-dynamodb-client';
 import { HasMetadata } from 'type-fns';
 
-import { ${domainObjectMetadata.name} } from '../../../domain';
+import { ${[domainObjectMetadata.name, ...referencesToImport].join(
+    ', ',
+  )} } from '../../../domain';
 import { getConfig } from '../../../utils/config/getConfig';
 import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
 import { log } from '../../../utils/logger';

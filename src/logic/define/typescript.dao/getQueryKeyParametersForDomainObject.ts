@@ -12,7 +12,7 @@ export enum QueryKeyType {
   SORT_BY_KEY = 'supplementalQuery.sortByKey',
 }
 
-export type QueryKeyParameters = Record<string, DomainObjectPropertyType>;
+export type QueryKeyParameters = Record<string, string>;
 
 export const getQueryKeyParametersForDomainObject = ({
   domainObjectMetadata,

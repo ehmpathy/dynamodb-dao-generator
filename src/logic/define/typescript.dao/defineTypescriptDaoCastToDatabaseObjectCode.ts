@@ -6,6 +6,7 @@ import { SupplementalQueryDeclaration } from '../../../domain/objects/Supplement
 import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
 import { getPackageVersion } from '../../../utils/getPackageVersion';
 import { QueryKeyType } from './getQueryKeyParametersForDomainObject';
+import { getReferenceTypePropertyNames } from './getReferenceTypePropertyNames';
 import { getTypescriptQueryKeySerializationCode } from './getTypescriptQueryKeySerializationCode';
 
 export const defineTypescriptDaoCastToDatabaseObjectCode = ({
@@ -22,11 +23,38 @@ export const defineTypescriptDaoCastToDatabaseObjectCode = ({
       { domainObjectMetadata },
     );
 
+  // determine whether we need to import serialization capabilities
+  const keyProperties: string[] = [
+    ...new Set([
+      ...domainObjectMetadata.decorations.unique,
+      ...supplementalQueries
+        .map((query) => [
+          ...query.filterByKey,
+          ...(query.sortByKey ? query.sortByKey : []),
+        ])
+        .flat(),
+    ]),
+  ];
+  const serializationUtilitiesRequired = getReferenceTypePropertyNames({
+    from: domainObjectMetadata,
+    for: { subset: keyProperties },
+  }).length;
+
+  // define the optional imports
+  const optionalImports = [
+    '',
+    ...(serializationUtilitiesRequired
+      ? [`import { serialize, omitMetadataValues } from 'domain-objects';`]
+      : []),
+  ];
+
   // define the code
   const code = `
 import { HasMetadata } from 'type-fns';
 
-import { ${domainObjectMetadata.name} } from '../../../domain';
+import { ${
+    domainObjectMetadata.name
+  } } from '../../../domain';${optionalImports.join('\n')}
 
 /**
  * defines how to cast the domain-object to a database-object
