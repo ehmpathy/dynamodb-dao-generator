@@ -54,8 +54,8 @@ export const defineTypescriptDaoFindAllBySupplementalQueryCode = ({
       })
     : null;
 
-  // determine whether we need serialization utilities
-  const serializationUtilitiesRequired = getReferenceTypePropertyNames({
+  // determine whether we need serialization utilities and which references to import
+  const referencedTypesToImport = getReferenceTypePropertyNames({
     from: domainObjectMetadata,
     for: {
       subset: [
@@ -63,7 +63,8 @@ export const defineTypescriptDaoFindAllBySupplementalQueryCode = ({
         ...Object.keys(sortKeyParameters ?? {}),
       ],
     },
-  }).length;
+  }).map(({ referencedType }) => referencedType);
+  const serializationUtilitiesRequired = referencedTypesToImport.length;
 
   // define the optional imports
   const optionalImports = [
@@ -153,7 +154,9 @@ ${optionalImports.join(
 )}import { simpleDynamodbClient } from 'simple-dynamodb-client';
 import { HasMetadata } from 'type-fns';
 
-import { ${domainObjectMetadata.name} } from '../../../domain';
+import { ${[domainObjectMetadata.name, ...referencedTypesToImport].join(
+    ', ',
+  )} } from '../../../domain';
 import { getConfig } from '../../../utils/config/getConfig';
 import { log } from '../../../utils/logger';
 import { castFromDatabaseObject } from './castFromDatabaseObject';${sortingOnKeyTypeGuards.join(
