@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.7](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.6...v1.0.7) (2024-04-26)
+
+
+### Bug Fixes
+
+* **findall:** import referenced types in supplemental findall queries ([b942d7b](https://github.com/ehmpathy/dynamodb-dao-generator/commit/b942d7ba4b6510af819146439558dc1631d3483e))
+
 ## [1.0.6](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.5...v1.0.6) (2024-04-26)
 
 
