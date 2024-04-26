@@ -9,6 +9,7 @@ import {
   getQueryKeyParametersForDomainObject,
   QueryKeyType,
 } from './getQueryKeyParametersForDomainObject';
+import { getReferenceTypePropertyNames } from './getReferenceTypePropertyNames';
 import { getTypescriptQueryKeySerializationCode } from './getTypescriptQueryKeySerializationCode';
 import { getTypescriptTableNameBuilderCode } from './getTypescriptTableNameBuilderCode';
 import { getTypescriptTypeForQueryParameters } from './getTypescriptTypeForQueryParameters';
@@ -52,6 +53,25 @@ export const defineTypescriptDaoFindAllBySupplementalQueryCode = ({
         keyType: QueryKeyType.SORT_BY_KEY,
       })
     : null;
+
+  // determine whether we need serialization utilities
+  const serializationUtilitiesRequired = getReferenceTypePropertyNames({
+    from: domainObjectMetadata,
+    for: {
+      subset: [
+        ...Object.keys(filterKeyParameters),
+        ...Object.keys(sortKeyParameters ?? {}),
+      ],
+    },
+  }).length;
+
+  // define the optional imports
+  const optionalImports = [
+    ...(serializationUtilitiesRequired
+      ? [`import { serialize, omitMetadataValues } from 'domain-objects';`]
+      : []),
+    '',
+  ];
 
   // define the sortByParameter modifiers with which to build up alternatives of the input parameters
   const sortByParameterModifiers = sortKeyParameters
@@ -128,7 +148,9 @@ const isSortingUntil = <T>(
 
   // define the code
   const code = `
-import { simpleDynamodbClient } from 'simple-dynamodb-client';
+${optionalImports.join(
+  '\n',
+)}import { simpleDynamodbClient } from 'simple-dynamodb-client';
 import { HasMetadata } from 'type-fns';
 
 import { ${domainObjectMetadata.name} } from '../../../domain';

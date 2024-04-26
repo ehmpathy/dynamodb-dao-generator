@@ -299,6 +299,7 @@ export const findByUnique = async (args: { forRegion: Region; }): Promise<HasMet
   },
   GeneratedCodeFile {
     "code": "
+import { serialize, omitMetadataValues } from 'domain-objects';
 import { simpleDynamodbClient } from 'simple-dynamodb-client';
 import { HasMetadata } from 'type-fns';
 
