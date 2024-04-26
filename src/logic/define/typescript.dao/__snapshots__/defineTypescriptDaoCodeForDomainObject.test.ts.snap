@@ -303,7 +303,7 @@ import { serialize, omitMetadataValues } from 'domain-objects';
 import { simpleDynamodbClient } from 'simple-dynamodb-client';
 import { HasMetadata } from 'type-fns';
 
-import { SeaTurtleReport } from '../../../domain';
+import { SeaTurtleReport, Region } from '../../../domain';
 import { getConfig } from '../../../utils/config/getConfig';
 import { log } from '../../../utils/logger';
 import { castFromDatabaseObject } from './castFromDatabaseObject';
