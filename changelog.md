@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.6](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.5...v1.0.6) (2024-04-26)
+
+
+### Bug Fixes
+
+* **findall:** import serialization to supplemental findall queries ([eba5cd3](https://github.com/ehmpathy/dynamodb-dao-generator/commit/eba5cd392b01bad5150b9ca5f3f35719e7a8c694))
+
 ## [1.0.5](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.4...v1.0.5) (2024-04-25)
 
 
