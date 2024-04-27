@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.8](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.7...v1.0.8) (2024-04-27)
+
+
+### Bug Fixes
+
+* **migrate:** embed ability to invoke migration as a command ([17ca689](https://github.com/ehmpathy/dynamodb-dao-generator/commit/17ca689f24f98a361f65e12bcd2a264cd8fb526c))
+
 ## [1.0.7](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.6...v1.0.7) (2024-04-26)
 
 
