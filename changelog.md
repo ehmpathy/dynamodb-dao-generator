@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.9](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.8...v1.0.9) (2024-05-05)
+
+
+### Bug Fixes
+
+* **errors:** make missing attribute errors easier to debug ([abda3d6](https://github.com/ehmpathy/dynamodb-dao-generator/commit/abda3d67aa90dc20404ec251d52a002786e45ac2))
+
 ## [1.0.8](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.7...v1.0.8) (2024-04-27)
 
 
