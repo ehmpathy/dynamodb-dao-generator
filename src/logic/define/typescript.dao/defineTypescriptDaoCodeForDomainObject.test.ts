@@ -1,3 +1,4 @@
+import { getError } from '@ehmpathy/error-fns';
 import {
   DomainObjectMetadata,
   DomainObjectPropertyType,
@@ -92,5 +93,33 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
       'p: JSON.stringify([serialize(omitMetadataValues(object.forRegion))]),', // should serialize the referenced valobj
     );
     expect(files).toMatchSnapshot();
+  });
+
+  it('should throw a helpful error if a supplemental query was requested on a unique key that is not an attribute of the dobj', () => {
+    const error = getError(() =>
+      defineTypescriptDaoCodeForDomainObject({
+        domainObjectMetadata: getExampleDomainObjectMetadata(),
+        supplementalQueries: [
+          {
+            filterByKey: ['temporalEntryPort'], // this key is not an attribute of the dobj
+          },
+        ],
+      }),
+    );
+    expect(error.message).toContain('could not find metadata of property');
+  });
+  it('should throw a helpful error if a supplemental query was requested on a sort key that is not an attribute of the dobj', () => {
+    const error = getError(() =>
+      defineTypescriptDaoCodeForDomainObject({
+        domainObjectMetadata: getExampleDomainObjectMetadata(),
+        supplementalQueries: [
+          {
+            filterByKey: ['age'],
+            sortByKey: ['averageSpeedRelativeToLight'], // this key is not an attribute of the dobj
+          },
+        ],
+      }),
+    );
+    expect(error.message).toContain('could not find metadata of property');
   });
 });

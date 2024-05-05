@@ -25,17 +25,17 @@ export const getTypescriptQueryKeySerializationCode = ({
     // determine if any of the keys are numbers
     const anyKeyIsNumber = keyProperties.some(
       (key) =>
-        domainObjectMetadata.properties[key]!.type ===
+        domainObjectMetadata.properties[key]?.type ===
         DomainObjectPropertyType.NUMBER,
     );
     const allKeysAreNumbers = keyProperties.every(
       (key) =>
-        domainObjectMetadata.properties[key]!.type ===
+        domainObjectMetadata.properties[key]?.type ===
         DomainObjectPropertyType.NUMBER,
     );
     const numberKeys = keyProperties.filter(
       (key) =>
-        domainObjectMetadata.properties[key]!.type ===
+        domainObjectMetadata.properties[key]?.type ===
         DomainObjectPropertyType.NUMBER,
     );
 

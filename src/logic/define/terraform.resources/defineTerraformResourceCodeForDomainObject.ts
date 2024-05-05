@@ -61,7 +61,7 @@ const getDynamodbTablePropertiesForSupplementalQuery = ({
     name = "s${queryNumber}"
     type = "${
       query.sortByKey.length === 1 &&
-      domainObjectMetadata.properties[query.sortByKey[0]!]!.type ===
+      domainObjectMetadata.properties[query.sortByKey[0]!]?.type ===
         DomainObjectPropertyType.NUMBER
         ? 'N' // if its a single sort key of numerical value, then we should track it as a number, to support numerical sorting (`"100" < "9"`, while `100 > 9`)
         : 'S'

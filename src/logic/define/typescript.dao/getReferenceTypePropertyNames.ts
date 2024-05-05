@@ -17,7 +17,7 @@ export const getReferenceTypePropertyNames = ({
       const propertyMetadata = dobjMetadata.properties[propertyName];
       if (!propertyMetadata)
         throw new UnexpectedCodePathError(
-          'could not find metadata of unique key property',
+          'could not find metadata of property',
           { propertyName, dobjMetadata },
         );
       if (!(propertyMetadata.of instanceof DomainObjectReferenceMetadata))
