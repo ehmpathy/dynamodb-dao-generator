@@ -11,8 +11,10 @@ export const defineTypescriptDaoUpsertCode = ({
   domainObjectMetadata: DomainObjectMetadata;
   supplementalQueries: SupplementalQueryDeclaration[]; // TODO: use this def to support creating per-reference-key unique table writes
 }): string => {
-  // define the object variable name
-  const objectVariableName = camelCase(domainObjectMetadata.name);
+  // define the input variable name
+  const dobjInputVariableName =
+    domainObjectMetadata.decorations.alias ?? // use the alias if defined
+    camelCase(domainObjectMetadata.name);
 
   // define the code
   const code = `
@@ -38,11 +40,11 @@ import { findByUnique } from './findByUnique';
  * written by dynamodb-dao-generator 🦾
  */
 export const upsert = async ({
-  ${objectVariableName}: object,
+  ${dobjInputVariableName}: object,
   lockOn,
   force,
 }: {
-  ${objectVariableName}: ${domainObjectMetadata.name};
+  ${dobjInputVariableName}: ${domainObjectMetadata.name};
 
   /**
    * the lockOn property enables you to optimistically lock on the entity being in a current state in the database before you write to it
@@ -106,7 +108,7 @@ export const upsert = async ({
 
   // cast the item
   const item = castToDatabaseObject({
-    ${objectVariableName}: objectWithDatabaseGeneratedValues,
+    ${dobjInputVariableName}: objectWithDatabaseGeneratedValues,
   });
 
   // open a transaction for an atomic write on the two writes we need to guarantee uniqueness on the two keys
@@ -173,7 +175,7 @@ export const upsert = async ({
         !askedToLockOnNull &&
         error.message.includes('optimistic lock failed')
       )
-        return upsert({ ${objectVariableName}: object }); // if we caught optimistic lock without the user asking for one, then retry it - it will pass this time
+        return upsert({ ${dobjInputVariableName}: object }); // if we caught optimistic lock without the user asking for one, then retry it - it will pass this time
 
       // otherwise, we still can't handle it
       throw error;

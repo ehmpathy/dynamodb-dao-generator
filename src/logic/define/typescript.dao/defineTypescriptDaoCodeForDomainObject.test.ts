@@ -11,11 +11,51 @@ import { defineTypescriptDaoCodeForDomainObject } from './defineTypescriptDaoCod
 
 describe('defineTypescriptDaoCodeForDomainObject', () => {
   it('can create typescript dao code for domain object with no supplemental queries', async () => {
-    const file = defineTypescriptDaoCodeForDomainObject({
+    const files = defineTypescriptDaoCodeForDomainObject({
       domainObjectMetadata: getExampleDomainObjectMetadata(),
       supplementalQueries: [],
     });
-    expect(file).toMatchSnapshot();
+    expect(files).toMatchSnapshot();
+  });
+  it('can create typescript dao code for domain object with an alias', async () => {
+    const files = defineTypescriptDaoCodeForDomainObject({
+      domainObjectMetadata: {
+        name: 'SeaSponge',
+        extends: DomainObjectVariant.DOMAIN_ENTITY,
+        properties: {
+          seawaterSecurityNumber: {
+            name: 'seawaterSecurityNumber',
+            type: DomainObjectPropertyType.STRING,
+          },
+          name: {
+            name: 'name',
+            type: DomainObjectPropertyType.STRING,
+          },
+          age: {
+            name: 'age',
+            type: DomainObjectPropertyType.NUMBER,
+          },
+          shape: {
+            name: 'shape',
+            type: DomainObjectPropertyType.ENUM,
+          },
+        },
+        decorations: {
+          alias: 'sponge',
+          primary: null,
+          unique: ['seawaterSecurityNumber'], // 😄
+          updatable: [],
+        },
+      },
+      supplementalQueries: [],
+    });
+    expect(files.find((file) => file.path.includes('upsert'))?.code).toContain(
+      'sponge: SeaSponge',
+    );
+    expect(
+      files.find((file) => file.path.includes('castToDatabaseObject'))?.code,
+    ).toContain('sponge: HasMetadata<SeaSponge>');
+    expect(files).toMatchSnapshot();
   });
   it('can create typescript dao code for domain object with some supplemental queries', async () => {
     const file = defineTypescriptDaoCodeForDomainObject({

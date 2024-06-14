@@ -566,6 +566,488 @@ if (require.main === module)
 ]
 `;
 
+exports[`defineTypescriptDaoCodeForDomainObject can create typescript dao code for domain object with an alias 1`] = `
+[
+  GeneratedCodeFile {
+    "code": "
+import { HasMetadata } from 'type-fns';
+
+import { SeaSponge } from '../../../domain';
+
+/**
+ * defines how to cast the domain-object to a database-object
+ *
+ * written by dynamodb-dao-generator 🦾
+ */
+export const castToDatabaseObject = ({
+  sponge: object,
+}: {
+  sponge: HasMetadata<SeaSponge>;
+}) => {
+  return {
+    byUuid: {
+      p: object.uuid,
+      o: JSON.stringify(object),
+    },
+    byUniqueOnNaturalKey: {
+      p: JSON.stringify([object.seawaterSecurityNumber]),
+      o: JSON.stringify(object),
+    },
+  };
+};
+  ",
+    "path": "seaSpongeDao/castToDatabaseObject.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import { HasMetadata } from 'type-fns';
+
+import { SeaSponge } from '../../../domain';
+
+/**
+ * defines how to cast a database-object to a domain-object
+ *
+ * written by dynamodb-dao-generator 🦾
+ */
+export const castFromDatabaseObject = (item: any) => {
+  // parse the item into an object
+  const parsedObject = JSON.parse(item.o);
+
+  // add defaults for backwards compatibility, if needed (e.g., for objects created before adding or changing fields)
+  const updatedObject = {
+    ...parsedObject,
+  };
+
+  // create the new object
+  return new SeaSponge(updatedObject) as HasMetadata<SeaSponge>;
+};
+  ",
+    "path": "seaSpongeDao/castFromDatabaseObject.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import { serialize, omitMetadataValues } from 'domain-objects';
+import { simpleDynamodbClient } from 'simple-dynamodb-client';
+import { HasMetadata } from 'type-fns';
+import { v4 as uuidv4 } from 'uuid';
+
+import { SeaSponge } from '../../../domain';
+import { getConfig } from '../../../utils/config/getConfig';
+import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
+import { log } from '../../../utils/logger';
+import { castToDatabaseObject } from './castToDatabaseObject';
+import { findByUnique } from './findByUnique';
+
+/**
+ * enables the upsert of a SeaSponge
+ *
+ * features
+ * - supports optimistic locking
+ * - autogenerates database metadata such as uuid and created at
+ *
+ * written by dynamodb-dao-generator 🦾
+ */
+export const upsert = async ({
+  sponge: object,
+  lockOn,
+  force,
+}: {
+  sponge: SeaSponge;
+
+  /**
+   * the lockOn property enables you to optimistically lock on the entity being in a current state in the database before you write to it
+   *
+   * for example
+   * - \`lockOn: null\` enforces that the entity does not exist in the database already by its natural unique key
+   */
+  lockOn?: null;
+
+  /**
+   * the force property enables you to write to the tables even if the current state of the entity is equivalent to the persisted state in the unique index table
+   *
+   * relevance
+   * - if you find that your index tables are out of sync due to a migration, you can force writing to all tables to propagate the latest state
+   */
+  force?: true;
+}) => {
+  const config = await getConfig();
+
+  // lookup current state, if any
+  const foundObject = await findByUnique(object);
+  if (foundObject && lockOn === null)
+    throw new UnexpectedCodePathError(
+      'object already exists but asked to lockOn null',
+      { foundObject, lockOn },
+    );
+  const mustLockOnNull = !foundObject; // if the domain-object does not exist, we'll be defining the uuid + createdAt, so must "lock-on-null" ourselves to fulfill the request + retry if failed
+  const askedToLockOnNull = lockOn === null; // track whether the user asked us to lock on null, separately, to enable deciding if we should propagate the error or just silently retry
+
+  // check if this would be a no op; if so, we can exit here
+  if (
+    foundObject &&
+    serialize(omitMetadataValues(new SeaSponge(object))) ===
+      serialize(omitMetadataValues(foundObject)) &&
+    !force
+  )
+    return foundObject; // if what we want to upsert is whats already in the database, we can exit here; saves on the expensive write operations
+
+  // define the object with database generated values
+  const objectWithDatabaseGeneratedValues = new SeaSponge({
+    ...object,
+
+    // if not already found, autogenerate the database-generated values; otherwise, just use them
+    ...(!foundObject
+      ? { uuid: uuidv4(), createdAt: new Date().toISOString() }
+      : { uuid: foundObject.uuid, createdAt: foundObject.createdAt }),
+
+    // and in either case, set a new updatedAt time
+    updatedAt: new Date().toISOString(),
+  }) as HasMetadata<SeaSponge>;
+
+  // cast the item
+  const item = castToDatabaseObject({
+    sponge: objectWithDatabaseGeneratedValues,
+  });
+
+  // open a transaction for an atomic write on the two writes we need to guarantee uniqueness on the two keys
+  const transaction = simpleDynamodbClient.startTransaction();
+
+  // put to the by-unique table, for each unique key, to ensure max one object per unique-key
+  transaction.queue.put({
+    tableName: \`\${config.service}-\${config.environment}-table-sea-sponge-by-unique-on-natural-key\`,
+    logDebug: log.debug,
+    item: item.byUniqueOnNaturalKey,
+    putConditions: mustLockOnNull // if must lock on null => ensure that there's no other record with this unique key when writing
+      ? {
+          ConditionExpression: 'attribute_not_exists(p)',
+        }
+      : undefined,
+  });
+
+  // put to the by-uuid table, to ensure max one object per uuid
+  transaction.queue.put({
+    tableName: \`\${config.service}-\${config.environment}-table-sea-sponge-by-uuid\`,
+    logDebug: log.debug,
+    item: item.byUuid,
+    putConditions: mustLockOnNull // if must lock on null => ensure that there's no other record with this unique key when writing
+      ? {
+          ConditionExpression: 'attribute_not_exists(p)',
+        }
+      : undefined,
+  });
+
+  // commit the txn
+  await transaction
+    .execute({ logDebug: log.debug })
+    .catch((error) => {
+      // make the errors more helpful
+      if (!(error instanceof Error)) throw error; // if not an error, we can't handle it
+
+      // handle error saying the record already existed
+      if (
+        error.message.includes(
+          'specific reasons [ConditionalCheckFailed, None',
+        ) ||
+        error.message.includes(
+          'specific reasons [None, ConditionalCheckFailed',
+        ) ||
+        error.message.includes(
+          'specific reasons [ConditionalCheckFailed, ConditionalCheckFailed',
+        )
+      )
+        throw new Error(
+          'optimistic lock failed, record already existed by unique key',
+        );
+
+      // if none of the cases above caught the error, then we didn't handle it
+      throw error;
+    })
+    .catch((error) => {
+      if (
+        !askedToLockOnNull &&
+        error.message.includes('optimistic lock failed')
+      )
+        return upsert({ sponge: object }); // if we caught optimistic lock without the user asking for one, then retry it - it will pass this time
+
+      // otherwise, we still can't handle it
+      throw error;
+    });
+
+  // return the object
+  return objectWithDatabaseGeneratedValues;
+};
+",
+    "path": "seaSpongeDao/upsert.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import { simpleDynamodbClient } from 'simple-dynamodb-client';
+import { HasMetadata } from 'type-fns';
+
+import { SeaSponge } from '../../../domain';
+import { getConfig } from '../../../utils/config/getConfig';
+import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
+import { log } from '../../../utils/logger';
+import { castFromDatabaseObject } from './castFromDatabaseObject';
+
+/**
+ * enables finding a SeaSponge by uuid
+ *
+ * written by dynamodb-dao-generator 🦾
+ */
+export const findByUuid = async ({ uuid }: { uuid: string }): Promise<HasMetadata<SeaSponge> | null> => {
+  const config = await getConfig();
+  const items = await simpleDynamodbClient.query({
+    tableName: \`\${config.service}-\${config.environment}-table-sea-sponge-by-uuid\`,
+    logDebug: log.debug,
+    attributesToRetrieveInQuery: ['o'],
+    queryConditions: {
+      KeyConditionExpression: 'p = :p',
+      ExpressionAttributeValues: {
+        ':p': uuid,
+      },
+    },
+  });
+  if (!items.length) return null;
+  if (items.length > 1)
+    throw new UnexpectedCodePathError(\`more than one object found by uuid\`, {
+      items,
+      uuid,
+    });
+  return castFromDatabaseObject(items[0]);
+};
+  ",
+    "path": "seaSpongeDao/findByUuid.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import { simpleDynamodbClient } from 'simple-dynamodb-client';
+import { HasMetadata } from 'type-fns';
+
+import { SeaSponge } from '../../../domain';
+import { getConfig } from '../../../utils/config/getConfig';
+import { UnexpectedCodePathError } from '../../../utils/errors/UnexpectedCodePathError';
+import { log } from '../../../utils/logger';
+import { castFromDatabaseObject } from './castFromDatabaseObject';
+
+/**
+ * enables finding a SeaSponge by its natural unique key
+ *
+ * written by dynamodb-dao-generator 🦾
+ */
+export const findByUnique = async (args: { seawaterSecurityNumber: string; }): Promise<HasMetadata<SeaSponge> | null> => {
+  const config = await getConfig();
+  const items = await simpleDynamodbClient.query({
+    tableName: \`\${config.service}-\${config.environment}-table-sea-sponge-by-unique-on-natural-key\`,
+    logDebug: log.debug,
+    attributesToRetrieveInQuery: ['o'],
+    queryConditions: {
+      KeyConditionExpression: 'p = :p',
+      ExpressionAttributeValues: {
+        ':p': JSON.stringify([args.seawaterSecurityNumber]),
+      },
+    },
+  });
+  if (!items.length) return null;
+  if (items.length > 1)
+    throw new UnexpectedCodePathError(\`more than one object found by unique\`, {
+      items,
+      args,
+    });
+  return castFromDatabaseObject(items[0]);
+};
+",
+    "path": "seaSpongeDao/findByUnique.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import { findByUnique } from './findByUnique';
+import { findByUuid } from './findByUuid';
+import { upsert } from './upsert';
+
+export const seaSpongeDao = {
+  findByUnique,
+  findByUuid,
+  upsert,
+};
+  ",
+    "path": "seaSpongeDao/index.ts",
+  },
+  GeneratedCodeFile {
+    "code": "
+import DynamoDB, { Key } from 'aws-sdk/clients/dynamodb';
+import Bottleneck from 'bottleneck';
+import { simpleDynamodbClient } from 'simple-dynamodb-client';
+
+import { getConfig } from '../../../../utils/config/getConfig';
+import { log } from '../../../../utils/logger';
+import { castFromDatabaseObject } from '../castFromDatabaseObject';
+import { castToDatabaseObject } from '../castToDatabaseObject';
+import { findByUnique } from '../findByUnique';
+import { upsert } from '../upsert';
+
+const bottleneck = new Bottleneck({ maxConcurrent: 1000 }); // beyond 1000 concurrent operations, failures making the requests occur
+
+/**
+ * reads all records from the database and then writes them back to the table, one at a time
+ * - makes sure to carefully handle the changing of the hash key of the unique table
+ *   - i.e., if your unique key or its serialization method changed, this will update the table's hash key to the new unique key format
+ * - makes sure to handle potential situations which would result in a second uuid being generated for the same entity
+ *   - i.e., if your unique key table does not have this record, but your uuid table does, then the record does have a uuid already it just was not indexed
+ *   - in these cases, we actually write to the unique table directly outside of the upsert function, to rebuild the findByUnique ability
+ * - this enables migrating to new schemas which may involve the complete replacement or new creation of secondary indexes or index tables
+ *   - since the source table can be customized, you can rebuild cleared tables or migrate to entirely new namespaces all together, easily
+ *
+ * note
+ * - this method is a exclusively developer tool and should not be used as a part of regular transaction processing
+ * - this code was generated by the 'dynamodb-dao-generator'
+ */
+export const migrateAllRecordsToNewSchema = async ({
+  dryrun,
+  sourceTableName: inputSourceTableName,
+}: {
+  /**
+   * show what would have been done without actually doing anything
+   */
+  dryrun: boolean;
+
+  /**
+   * enable specifying a different source table to migrate the data from
+   *
+   * note
+   * - by default, we load the data from the *ByUniqueOnNaturalKey table
+   */
+  sourceTableName?: string;
+}) => {
+  // define the tables
+  const config = await getConfig();
+  const uniqueKeyTableName = \`\${config.service}-\${config.environment}-table-sea-sponge-by-unique-on-natural-key\`
+  const sourceTableName = inputSourceTableName ?? uniqueKeyTableName; // by default, read from the unique natural key table for this domain object
+
+  // read all records from the table, looping through each page
+  const dynamodbClient = new DynamoDB.DocumentClient(); // TODO: support scan operation w/ of simpleDynamodbClient https://github.com/uladkasach/simple-dynamodb-client/issues/4
+  const pages: any[][] = [];
+  let lastEvaluatedKey: Key | undefined;
+  while (true) {
+    log.info('migrateAllRecordsToNewSchema.progress: querying for a page', {
+      from: sourceTableName,
+      lastEvaluatedKey,
+      pagesSoFar: pages.length,
+      itemsSoFar: pages.flat().length,
+    });
+    const result = await dynamodbClient
+      .scan({
+        TableName: sourceTableName,
+        ProjectionExpression: 'p,o',
+        ExclusiveStartKey: lastEvaluatedKey,
+      })
+      .promise();
+    pages.push(result.Items ?? []);
+    if (!result.LastEvaluatedKey) break; // exit the loop once there are no more pages, as identified by the lastEvaluatedKey no longer being defined
+    lastEvaluatedKey = result.LastEvaluatedKey;
+  }
+  const items = pages.flat();
+  const objects = items.map(castFromDatabaseObject);
+  log.info(
+    'migrateAllRecordsToNewSchema.progress: fetched all dynamodb items',
+    { result: { pages: pages.length, items: items.length } },
+  );
+
+  // write each item who's serialized unique key representation changed; this is to ensure that we'll find the object in the upsert and therefore use the original uuid rather than assign a new one
+  const writtenRecords: any[] = [];
+  await Promise.all(
+    objects.map(async (object, index) =>
+      bottleneck.schedule(async () => {
+        // lookup the expected and found serialized key
+        const item = castToDatabaseObject({
+          seaSponge: object,
+        });
+        const expectedSerializedUniqueKey = item.byUniqueOnNaturalKey.p;
+        const foundSerializedUniqueKey = items[index].p;
+
+        // if the expected key is the found key, then there's no special write needed
+        if (expectedSerializedUniqueKey === foundSerializedUniqueKey) return;
+
+        // otherwise, check whether a record already exists for the expected key (to avoid accidentally overwriting newer data with older data)
+        const alsoFoundByExpectedKey = await findByUnique(object);
+        log.debug(
+          'migrateAllRecordsToNewSchema.progress: found record with outdated unique key serialization to replace and remove',
+          {
+            expectedSerializedUniqueKey,
+            foundSerializedUniqueKey,
+            alsoFoundByExpectedKey: !!alsoFoundByExpectedKey,
+          },
+        );
+
+        // if its safe to do so, write the found object to the unique key table with the expected key
+        if (
+          !alsoFoundByExpectedKey || //  if the object doesn't already exist by the expected key, then its safe to do so, since cant overwrite data
+          alsoFoundByExpectedKey.updatedAt < object.updatedAt // if the object found by the expected key has an updatedAt timestamp earlier than our current object, then our current object is more up to date, so its safe to do so here too
+        ) {
+          if (!dryrun)
+            await simpleDynamodbClient.put({
+              tableName: uniqueKeyTableName,
+              logDebug: log.debug,
+              item: item.byUniqueOnNaturalKey,
+            });
+          writtenRecords.push(object);
+        }
+      }),
+    ),
+  );
+  log.info(
+    'migrateAllRecordsToNewSchema.progress: updated unique key table records',
+    { uniqueKeyTableName, writtenRecords: writtenRecords.length },
+  );
+
+  // write each item back to the database using upsert, which will ensure that its written to all the required indexes
+  if (!dryrun)
+    await Promise.all(
+      objects.map((object) =>
+        bottleneck.schedule(async () =>
+          upsert({
+            seaSponge: object,
+            force: true, // note: must use \`force\` since the unique index would have just received the latest data, so it would seem like no writes are needed
+          }),
+        ),
+      ),
+    );
+  log.info('migrateAllRecordsToNewSchema.progress: force upserted each object', { objects: objects.length })
+
+  // return stats
+  const stats = {
+    from: sourceTableName,
+    to: uniqueKeyTableName,
+
+    /**
+     * the row level modifications needed to support the migration
+     */
+    modified: {
+      writtenUniqueKeyRecords: writtenRecords.length,
+    },
+
+    /**
+     * the overall domain objects that were successfully migrated
+     */
+    migrated: {
+      objects: objects.length,
+    },
+  };
+  log.info('migrateAllRecordsToNewSchema.output', { stats, dryrun });
+  return stats;
+};
+
+// DRYRUN=true STAGE=test npx tsx __PATH_TO_FILE__
+if (require.main === module)
+  void migrateAllRecordsToNewSchema({
+    dryrun: process.env.DRYRUN !== 'false', // assume true unless told otherwise
+  });
+",
+    "path": "seaSpongeDao/.maintenance/migrateAllRecordsToNewSchema.ts",
+  },
+]
+`;
+
 exports[`defineTypescriptDaoCodeForDomainObject can create typescript dao code for domain object with no supplemental queries 1`] = `
 [
   GeneratedCodeFile {

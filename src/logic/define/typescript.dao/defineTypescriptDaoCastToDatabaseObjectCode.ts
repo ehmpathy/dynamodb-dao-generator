@@ -48,6 +48,11 @@ export const defineTypescriptDaoCastToDatabaseObjectCode = ({
       : []),
   ];
 
+  // define the input variable name
+  const dobjInputVariableName =
+    domainObjectMetadata.decorations.alias ?? // use the alias if defined
+    camelCase(domainObjectMetadata.name);
+
   // define the code
   const code = `
 import { HasMetadata } from 'type-fns';
@@ -62,11 +67,9 @@ import { ${
  * written by dynamodb-dao-generator 🦾
  */
 export const castToDatabaseObject = ({
-  ${camelCase(domainObjectMetadata.name)}: object,
+  ${dobjInputVariableName}: object,
 }: {
-  ${camelCase(domainObjectMetadata.name)}: HasMetadata<${
-    domainObjectMetadata.name
-  }>;
+  ${dobjInputVariableName}: HasMetadata<${domainObjectMetadata.name}>;
 }) => {
   return {
     byUuid: {
