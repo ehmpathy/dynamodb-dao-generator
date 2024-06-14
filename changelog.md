@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.10...v1.1.0) (2024-06-14)
+
+
+### Features
+
+* **alias:** support dobj alias defs used as input var names ([e0ddf3e](https://github.com/ehmpathy/dynamodb-dao-generator/commit/e0ddf3e269dc9f253e8d4c6dab0f52dde9d797a3))
+
 ## [1.0.10](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.9...v1.0.10) (2024-06-14)
 
 
