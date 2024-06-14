@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.10](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.9...v1.0.10) (2024-06-14)
+
+
+### Bug Fixes
+
+* **deps:** bump to latest version of dobjs and dobj metadata ([ae0f983](https://github.com/ehmpathy/dynamodb-dao-generator/commit/ae0f983e6a40fc889e29fe97e2e00b20bad747bc))
+
 ## [1.0.9](https://github.com/ehmpathy/dynamodb-dao-generator/compare/v1.0.8...v1.0.9) (2024-05-05)
 
 
