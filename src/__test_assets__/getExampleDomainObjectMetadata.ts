@@ -27,6 +27,8 @@ export const getExampleDomainObjectMetadata = (): DomainObjectMetadata =>
       },
     },
     decorations: {
+      alias: null,
+      primary: null,
       unique: ['seawaterSecurityNumber'], // 😄
       updatable: [],
     },

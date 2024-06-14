@@ -104,7 +104,7 @@ export interface Geocode {
   latitude: number;
   longitude: number;
 }
-export class Geocode extends DomainValueObject<Geocode> implements Geocode {}
+export class Geocode extends DomainLiteral<Geocode> implements Geocode {}
 ```
 
 **Output:** Running this dynamodb-dao-generator on this domain object will:

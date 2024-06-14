@@ -36,7 +36,7 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
     });
     expect(file).toMatchSnapshot();
   });
-  it('can create typescript dao code for domain object with a unique key on a domain value object', async () => {
+  it('can create typescript dao code for domain object with a unique key on a domain literal', async () => {
     const files = defineTypescriptDaoCodeForDomainObject({
       domainObjectMetadata: new DomainObjectMetadata({
         name: 'SeaTurtleReport',
@@ -47,7 +47,7 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
             type: DomainObjectPropertyType.REFERENCE,
             of: new DomainObjectReferenceMetadata({
               name: 'Region',
-              extends: DomainObjectVariant.DOMAIN_VALUE_OBJECT,
+              extends: DomainObjectVariant.DOMAIN_LITERAL,
             }),
           },
           onDate: {
@@ -61,6 +61,8 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
           },
         },
         decorations: {
+          alias: null,
+          primary: null,
           unique: ['forRegion'],
           updatable: [],
         },
@@ -80,17 +82,17 @@ describe('defineTypescriptDaoCodeForDomainObject', () => {
     expect(
       files.find((file) => file.path.includes('findByUnique'))?.code,
     ).toContain(
-      `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced valobj
+      `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced literal
     );
     expect(
       files.find((file) => file.path.includes('castToDatabaseObject'))?.code,
     ).toContain(
-      `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced valobj
+      `import { serialize, omitMetadataValues } from 'domain-objects';`, // should be able to serialize the referenced literal
     );
     expect(
       files.find((file) => file.path.includes('castToDatabaseObject'))?.code,
     ).toContain(
-      'p: JSON.stringify([serialize(omitMetadataValues(object.forRegion))]),', // should serialize the referenced valobj
+      'p: JSON.stringify([serialize(omitMetadataValues(object.forRegion))]),', // should serialize the referenced literal
     );
     expect(files).toMatchSnapshot();
   });

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`defineTypescriptDaoCodeForDomainObject can create typescript dao code for domain object with a unique key on a domain value object 1`] = `
+exports[`defineTypescriptDaoCodeForDomainObject can create typescript dao code for domain object with a unique key on a domain literal 1`] = `
 [
   GeneratedCodeFile {
     "code": "

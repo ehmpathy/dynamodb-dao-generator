@@ -52,7 +52,7 @@ export const getTypescriptQueryKeySerializationCode = ({
       );
   }
 
-  // determine whether any of the keys are nested domain.value-objects, since they require extra serialization
+  // determine whether any of the keys are nested domain.literals, since they require extra serialization
   const keyPropertiesOfTypeReferenceToSerialize = getReferenceTypePropertyNames(
     {
       from: domainObjectMetadata,

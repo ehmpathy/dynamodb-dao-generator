@@ -1,5 +1,5 @@
 import { BadRequestError } from '@ehmpathy/error-fns';
-import { DomainValueObject } from 'domain-objects';
+import { DomainLiteral } from 'domain-objects';
 import {
   DomainObjectPropertyMetadata,
   DomainObjectPropertyType,
@@ -34,11 +34,10 @@ export const getTypescriptTypeForDomainObjectProperty = ({
     ) {
       // sanity check that the caller is following persistance best practices
       if (
-        domainObjectProperty.of.extends !==
-        DomainObjectVariant.DOMAIN_VALUE_OBJECT
+        domainObjectProperty.of.extends !== DomainObjectVariant.DOMAIN_LITERAL
       )
         throw new BadRequestError(
-          'domain objects should only have domain-value-objects as nested properties. references to different variants of domain objects should be done via lookup keys, primary or unique.',
+          'domain objects should only have domain-literals as nested properties. references to different variants of domain objects should be done via lookup keys, primary or unique.',
           {
             domainObjectName,
             domainObjectPropertyName: domainObjectProperty.name,

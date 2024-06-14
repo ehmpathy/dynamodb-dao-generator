@@ -1,4 +1,4 @@
-import { DomainValueObject } from 'domain-objects';
+import { DomainLiteral } from 'domain-objects';
 
 export interface GeneratedCodeFile {
   /**
@@ -13,5 +13,5 @@ export interface GeneratedCodeFile {
   code: string;
 }
 export class GeneratedCodeFile
-  extends DomainValueObject<GeneratedCodeFile>
+  extends DomainLiteral<GeneratedCodeFile>
   implements GeneratedCodeFile {}

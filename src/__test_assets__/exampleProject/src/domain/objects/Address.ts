@@ -1,4 +1,4 @@
-import { DomainValueObject } from 'domain-objects';
+import { DomainLiteral } from 'domain-objects';
 
 export interface Address {
   uuid?: string;
@@ -9,6 +9,6 @@ export interface Address {
   country: string;
   postal: string;
 }
-export class Address extends DomainValueObject<Address> implements Address {
-  public static unique = ['city', 'state', 'country', 'postal']; // TODO: fix dynamodb-dao-generator so it understands that domain-value-objects are unique on all non-metadata keys
+export class Address extends DomainLiteral<Address> implements Address {
+  public static unique = ['city', 'state', 'country', 'postal']; // TODO: fix dynamodb-dao-generator so it understands that domain-literals are unique on all non-metadata keys
 }

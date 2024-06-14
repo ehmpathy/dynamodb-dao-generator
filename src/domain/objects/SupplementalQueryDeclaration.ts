@@ -1,4 +1,4 @@
-import { DomainValueObject } from 'domain-objects';
+import { DomainLiteral } from 'domain-objects';
 
 /**
  * declares a supplemental query that should be available on the dao for a domain object
@@ -15,5 +15,5 @@ export interface SupplementalQueryDeclaration {
   sortByKey?: string[];
 }
 export class SupplementalQueryDeclaration
-  extends DomainValueObject<SupplementalQueryDeclaration>
+  extends DomainLiteral<SupplementalQueryDeclaration>
   implements SupplementalQueryDeclaration {}
